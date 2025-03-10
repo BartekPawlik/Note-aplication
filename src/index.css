@@ -61,25 +61,33 @@ body {
 }
 
 .sidebar li {
-  display: grid;
-  grid-template-columns: 4.8rem 1fr auto;
-  align-items: center;
+  display: flex;
+  /* grid-template-columns: 4.8rem 1fr auto; */
+  align-items: start;
   column-gap: 1.6rem;
 
   padding: 1.2rem;
   border-radius: 7px;
   transition: 0.5s;
 }
-
+h4{
+  text-wrap: nowrap;
+}
 .selected,
 .sidebar li:hover {
   background-color: var(--color-lightest);
+}
+
+.items-container{
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar li img {
   border-radius: 50%;
   width: 100%;
   grid-row: span 2;
+  max-width: 100px;
 }
 
 .sidebar li h3 {
@@ -134,11 +142,11 @@ label {
   font-weight: 500;
 }
 
-label::first-letter {
+/* label::first-letter {
   display: inline-block;
   margin-right: 4px;
   font-size: 1.8rem;
-}
+} */
 
 input,
 select {
