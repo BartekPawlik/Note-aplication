@@ -26,14 +26,22 @@ body {
   justify-content: center;
 }
 
-.app {
-  width: 100%;
-  min-height: 66vh;
-  display: grid;
-  grid-template-columns: 34rem 44rem;
-  column-gap: 4rem;
-  align-items: start;
+.App {
+display: flex;
+gap:30px;
+color: #495057;
 }
+
+.user-panel{
+  background-color: #dadbdb;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-panel label{
+font-size: 16px;
+}
+
 
 .button {
   background-color: var(--color-medium);
@@ -87,7 +95,8 @@ h4{
   border-radius: 50%;
   width: 100%;
   grid-row: span 2;
-  max-width: 100px;
+  max-width: 50px;
+
 }
 
 .sidebar li h3 {

@@ -1,5 +1,4 @@
-import { use } from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const initialShopList = [
   {
@@ -27,33 +26,66 @@ const initialShopList = [
 
 export default function App() {
   const [clients, setClients] = useState(initialShopList);
+  const [selectedPartner, setSelectedPartner] = useState(null);
+
+  function partnerDispaly(partner) {
+    setSelectedPartner(partner);
+    console.log(partner);
+  }
 
   function handleShopClients(newItem) {
     setClients((client) => [...client, newItem]);
   }
+
+  function handleUpdatePartner(updatePartner) {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === updatePartner.id ? updatePartner : client
+      )
+    );
+    setSelectedPartner(updatePartner)
+  }
+
+
+  function removeClient(){
+   if(selectedPartner) {
+    setClients((prev) =>
+    prev.filter((client)=> client.id !== selectedPartner.id))
+   }
+   setSelectedPartner(null)
+  }
   return (
     <div className="App">
       <div className="sidebar">
-        <ShopList client={clients} />
+        <ShopList
+          client={clients}
+          partnerdispaly={partnerDispaly}
+          selectedPartner={selectedPartner}
+        />
         <AddCustomer handleClients={handleShopClients} />
       </div>
+      <UserPanel selectedPartner={selectedPartner} setPartner={handleUpdatePartner} removeclient={removeClient} />
     </div>
   );
 }
 
-function ShopList({ client }) {
+function ShopList({ client, partnerdispaly, selectedPartner }) {
   return (
     <div className="shop-list">
       {client.map((shop) => (
-        <ShopItem shop={shop} key={shop.id} />
+        <ShopItem
+          shop={shop}
+          key={shop.id}
+          partnerdispaly={partnerdispaly}
+        />
       ))}
     </div>
   );
 }
 
-function ShopItem({ shop }) {
+function ShopItem({ shop, partnerdispaly }) {
   return (
-    <li>
+    <li onClick={() => partnerdispaly(shop)}>
       <img src={shop.image} alt={shop.name} />
       <div className="items-container">
         <h3>{shop.client}</h3>
@@ -110,4 +142,51 @@ function AddCustomer({ handleClients }) {
       <button>Add</button>
     </form>
   );
+}
+
+function UserPanel({ selectedPartner, setPartner, removeclient }) {
+const [client, setClient] = useState(selectedPartner?.client || "")
+const [name, setName] = useState(selectedPartner?.name || "")
+const [price, setPrice] = useState(selectedPartner?.price || "")
+
+
+React.useEffect(() => {
+  if (selectedPartner) {
+    setClient(selectedPartner.client);
+    setName(selectedPartner.name);
+    setPrice(selectedPartner.price);
+  }
+}, [selectedPartner]);
+
+
+
+
+  function handleChanges(){
+    const updated = {
+      ...selectedPartner,
+      client,
+      name,
+      price: parseFloat(price),
+    };
+    setPartner(updated);
+  }
+
+
+
+  if (!selectedPartner) return null
+    return (
+      <div className="user-panel">
+        <label>user name</label>
+        <input
+          value={client}
+          onChange={(e) => setClient(e.target.value)}
+        />
+        <label>Item</label>
+        <input value={name}  onChange={(e) => setName(e.target.value)} />
+        <label>Price</label>
+        <input value={price}  onChange={(e) => setPrice(e.target.value)} />
+        <button onClick={handleChanges}>change</button>
+        <button onClick={removeclient}>delete</button>
+      </div>
+    );
 }
