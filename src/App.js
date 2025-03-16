@@ -1,192 +1,133 @@
 import React, { useState, useEffect } from "react";
 
-const initialShopList = [
+const initialNotes = [
   {
-    id: 123459,
-    client: "Tom",
-    name: "umbrela",
-    price: 14.5,
-    image: "https://i.pravatar.cc/48?u=499476",
+    id: 1,
+    title: "pierwszy",
+    text: "Pierwsza notatka",
   },
   {
-    id: 123426,
-    client: "Jerry",
-    name: "knife",
-    price: 11.5,
-    image: "https://i.pravatar.cc/48?u=499472",
+    id: 2,
+    title: "drugi",
+    text: "Druga notatka",
   },
   {
-    id: 123451,
-    client: "guy",
-    name: "ball",
-    price: 9.5,
-    image: "https://i.pravatar.cc/48?u=499471",
+    id: 3,
+    title: "trzeci",
+    text: "Trzecia notatka",
   },
 ];
 
 export default function App() {
-  const [clients, setClients] = useState(initialShopList);
-  const [selectedPartner, setSelectedPartner] = useState(null);
+  const [notes, setNotes] = useState(initialNotes);
+  const [selectedNote, setSelectedNote] = useState();
 
-  function partnerDispaly(partner) {
-    setSelectedPartner(partner);
-    console.log(partner);
+  function handleNotes(note) {
+    setNotes((prev) => [...prev, note]);
   }
 
-  function handleShopClients(newItem) {
-    setClients((client) => [...client, newItem]);
-  }
-
-  function handleUpdatePartner(updatePartner) {
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === updatePartner.id ? updatePartner : client
-      )
-    );
-    setSelectedPartner(updatePartner)
-  }
-
-
-  function removeClient(){
-   if(selectedPartner) {
-    setClients((prev) =>
-    prev.filter((client)=> client.id !== selectedPartner.id))
-   }
-   setSelectedPartner(null)
+  function handleSelectNote(note) {
+    setSelectedNote(note);
+    console.log(note);
   }
   return (
-    <div className="App">
-      <div className="sidebar">
-        <ShopList
-          client={clients}
-          partnerdispaly={partnerDispaly}
-          selectedPartner={selectedPartner}
+    <div className="app">
+      <div className="update-text">
+        <UpdateTextNote
+          selectedNote={selectedNote}
+          setselectednote={setSelectedNote}
+          setNotes={setNotes}
         />
-        <AddCustomer handleClients={handleShopClients} />
       </div>
-      <UserPanel selectedPartner={selectedPartner} setPartner={handleUpdatePartner} removeclient={removeClient} />
+      <div className="set-container">
+        <ListNotes notes={notes} handleSelectNote={handleSelectNote} />
+        <NotesPanel handleNotes={handleNotes} />
+      </div>
     </div>
   );
 }
-
-function ShopList({ client, partnerdispaly, selectedPartner }) {
+function ListNotes({ notes, handleSelectNote }) {
   return (
-    <div className="shop-list">
-      {client.map((shop) => (
-        <ShopItem
-          shop={shop}
-          key={shop.id}
-          partnerdispaly={partnerdispaly}
-        />
+    <div className="notes-list">
+      {notes.map((note, index) => (
+        <div key={index} className="note">
+          <Note handleSelectNote={handleSelectNote} note={note} />
+        </div>
       ))}
     </div>
   );
 }
 
-function ShopItem({ shop, partnerdispaly }) {
+function Note({ note, handleSelectNote }) {
   return (
-    <li onClick={() => partnerdispaly(shop)}>
-      <img src={shop.image} alt={shop.name} />
-      <div className="items-container">
-        <h3>{shop.client}</h3>
-        <h4>item name: {shop.name}</h4>
-        <p>{shop.price}$</p>
-      </div>
-    </li>
+    <div onClick={() => handleSelectNote(note)}>
+      <p>{note.title}</p>
+    </div>
   );
 }
 
-function AddCustomer({ handleClients }) {
-  const [client, setClient] = useState("");
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState();
-  const [image, setImage] = useState("https://i.pravatar.cc/48");
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    const id = crypto.randomUUID();
-
-    const newItem = {
-      id,
-      image,
-      client,
-      name,
-      price,
+function NotesPanel({ handleNotes }) {
+  const [newTitle, setNewTitle] = useState("");
+  const [newText, setNewText] = useState("");
+  function addNote() {
+    const newNote = {
+      id: Date.now(),
+      title: newTitle,
+      text: newText,
     };
-
-    handleClients(newItem);
-    setClient("");
-    setName("");
-    setPrice("");
-    setImage("https://i.pravatar.cc/48");
+    handleNotes(newNote);
+    setNewText("");
+    setNewTitle("");
   }
 
   return (
-    <form className="form-add-friend" onSubmit={handleSubmit}>
-      <label>client name</label>
-      <input value={client} onChange={(e) => setClient(e.target.value)} />
-      <label>product</label>
-      <input value={name} onChange={(e) => setName(e.target.value)} />
-      <label>price</label>
-      <input
-        value={price}
-        type="number"
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      <label>Image Url 🖼</label>
-      <input
-        value={image}
-        onChange={(e) => setImage(e.target.value)}
-        type="text"
-      />
-      <button>Add</button>
-    </form>
+    <div className="panel-notes">
+      <label>Tytuł notatki</label>
+      <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+      <label>Treść notatki</label>
+      <textarea value={newText} onChange={(e) => setNewText(e.target.value)} />
+      <button onClick={addNote}>Dodaj notatke</button>
+    </div>
   );
 }
 
-function UserPanel({ selectedPartner, setPartner, removeclient }) {
-const [client, setClient] = useState(selectedPartner?.client || "")
-const [name, setName] = useState(selectedPartner?.name || "")
-const [price, setPrice] = useState(selectedPartner?.price || "")
+function UpdateTextNote({ selectedNote, setselectednote, setNotes }) {
+  if (!selectedNote) return null;
 
 
-React.useEffect(() => {
-  if (selectedPartner) {
-    setClient(selectedPartner.client);
-    setName(selectedPartner.name);
-    setPrice(selectedPartner.price);
-  }
-}, [selectedPartner]);
+function handleTitleChange(newTitle){
+const updatenote = {
+  ...selectedNote,
+  title: newTitle,
+}
+setselectednote(updatenote)
+
+setNotes((prev) =>
+prev.map((title) =>
+title.id === selectedNote.id ? updatenote : title))
+}
 
 
-
-
-  function handleChanges(){
-    const updated = {
-      ...selectedPartner,
-      client,
-      name,
-      price: parseFloat(price),
+  function handleTextChange(newText) {
+    const updatenote = {
+      ...selectedNote,
+      // title:
+      text: newText,
     };
-    setPartner(updated);
-  }
+    setselectednote(updatenote);
 
-
-
-  if (!selectedPartner) return null
-    return (
-      <div className="user-panel">
-        <label>user name</label>
-        <input
-          value={client}
-          onChange={(e) => setClient(e.target.value)}
-        />
-        <label>Item</label>
-        <input value={name}  onChange={(e) => setName(e.target.value)} />
-        <label>Price</label>
-        <input value={price}  onChange={(e) => setPrice(e.target.value)} />
-        <button onClick={handleChanges}>change</button>
-        <button onClick={removeclient}>delete</button>
-      </div>
+    setNotes((prev) =>
+      prev.map((note) => (note.id === selectedNote.id ? updatenote : note))
     );
+  }
+
+  return (
+    <div className="update-note">
+      <input value={selectedNote.title} onChange={(e) => handleTitleChange(e.target.value)} />
+      <textarea
+        value={selectedNote.text}
+        onChange={(e) => handleTextChange(e.target.value)}
+      />
+    </div>
+  );
 }
