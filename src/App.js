@@ -121,6 +121,13 @@ title.id === selectedNote.id ? updatenote : title))
     );
   }
 
+  function removeNote(id){
+  setNotes((prev) =>
+    prev.filter((note) => note.id !== id)
+)
+setselectednote()
+  }
+
   return (
     <div className="update-note">
       <input value={selectedNote.title} onChange={(e) => handleTitleChange(e.target.value)} />
@@ -128,6 +135,7 @@ title.id === selectedNote.id ? updatenote : title))
         value={selectedNote.text}
         onChange={(e) => handleTextChange(e.target.value)}
       />
+      <button onClick={() =>removeNote(selectedNote.id)}>remove</button>
     </div>
   );
 }
